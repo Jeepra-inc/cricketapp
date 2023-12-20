@@ -1,0 +1,182 @@
+<div class="col-md-6 card p-4 border bg-light ">
+    <form method="post" id="liveScoreForm" data-team="" data-out="" data-inning="{{ match.inning }}" data-batting="{{ match.batting_team_id }}" data-bowler="{{ match.bowler_id }}">
+        {% csrf_token %}
+        <div class="batting-player-stats">                
+            <table class="table table-borderless mb-4 rounded shadow-sm overflow-hidden text-center">
+                <thead>
+                    <tr>                    
+                        <th class="d-flex align-items-center">
+                            <span class="batting-team-logo me-1">
+                                <img class="border rounded-circle" style="width: 30px; height:30px;"  src="{{ match.batting_team.logo.url }}" alt="{{ match.batting_team.name }} Logo">                         
+                            </span> {{ match.batting_team }}
+                            <svg class="sm-icon ms-2 border-start ps-2" xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 512 512"><path d="M18.5 1.6c-6.7 3.5-9.8 8.7-9.7 16.5.1 5.2 2.4 9.7 7.5 14.7l4.3 4.2 12.7-12.8 12.8-12.8-5-4.7c-2.8-2.6-6.2-5.2-7.6-5.7-3.9-1.5-11.6-1.2-15 .6zm469.9-.5c-1.8.5-5.5 3-8.4 5.6l-5.2 4.6 12.8 12.8L500.4 37l3.9-3.8c7.3-7 9.4-15 5.8-22.7-3.8-8.4-12.5-12.1-21.7-9.4zM46 37.5 33.5 50l6.2 6.2 6.3 6.2 4.2-4c5.3-5.1 7.2-5.8 11.5-4.3 3.5 1.1 6.3 5.1 6.3 8.9 0 1.1-2.1 4.3-4.7 7.1l-4.7 5 6.4 6.4 6.4 6.4 4.7-4.4c5.8-5.4 10.4-6.1 14.4-2 4.1 4 3.4 8.6-2 14.4l-4.4 4.7 6.4 6.4 6.4 6.4 5-4.7c5.8-5.4 8.5-5.9 13-2.1 2.5 2.1 3.1 3.3 3.1 6.5s-.8 4.8-4.2 8.5l-4.2 4.5 12 12c10.6 10.7 15.5 14.5 44.4 34.8 17.9 12.5 33 23 33.6 23.4.6.3 2.3-.6 3.8-2.2l2.6-2.8-22.6-32.4-22.6-32.4-50.7-50.8C82.3 47.8 59.3 25 59 25c-.3 0-6.1 5.6-13 12.5zm364.9 38.2-50.6 50.8-28 40.1c-31.9 45.6-30.1 43-28.2 41.9.8-.5 19.9-13.8 42.4-29.6 37.6-26.4 42-29.7 52.9-40.8l12-12-4.2-4.5c-5.1-5.5-5.7-10.2-1.7-14.1 4.2-4.2 8.6-3.7 14.3 1.8l4.2 4.1 6.5-6.4 6.4-6.4-4.4-4.7c-5.4-5.8-6.1-10.4-2-14.4 4-4.1 8.6-3.4 14.4 2l4.7 4.4 6.4-6.4 6.4-6.5-4.4-4.5c-5.3-5.4-5.9-9.8-2-14 3.8-4.1 9-3.5 14.6 1.7l4.5 4.2 6.2-6.2 6.2-6.2L475 37.5c-6.9-6.9-12.7-12.5-13-12.5-.3 0-23.3 22.8-51.1 50.7zm-229.3 42.4c-1.5 1.2-2.5 2.7-2.3 3.3.4 1 38.1 55.3 39.4 56.6.2.2 6.8-6 14.6-13.8l14.2-14.2-17.1-17-17-17h-14.6c-13.3 0-14.8.2-17.2 2.1z"/><path d="M158.3 265.2 9 414.5v6.6c0 7.5 3.3 20.3 7.9 30.4 11.3 25 35.7 44.3 63.1 50.1 7.5 1.6 16.4 1.8 18.8.5.9-.5 68.2-67.7 149.5-149.4L396 204.2v-14.5c0-13.2-.2-14.7-2.1-17.1-1.2-1.5-2.7-2.5-3.3-2.3-.7.3-18.7 12.8-40.1 27.7-21.5 15-40.4 27.9-42.2 28.6-14 5.9-28.8-8.9-22.9-22.9.7-1.8 13.6-20.8 28.6-42.2 15-21.5 27.5-39.8 27.7-40.7 1-3.5-4.5-4.8-19.9-4.8h-14.3L158.3 265.2zm1.8 35.7c2 2.1 2.9 3.9 2.9 6.3 0 3-4.8 8-58.4 61.8l-58.4 58.5 1.3 3.6c2.2 6.2 5.6 12.3 9.4 16.9 7 8.3 7.6 11.1 3.5 15.9-2.1 2.5-3.3 3.1-6.6 3.1-3.4 0-4.6-.6-7.5-3.8-10-10.8-18.3-28.3-18.3-38.6 0-4.1.4-4.4 61.3-65.3 56.4-56.4 61.5-61.3 64.5-61.3 2.4 0 4.2.9 6.3 2.9zm-33.4-128c-1.4 2.4-1.7 5.4-1.7 17.2v14.3l17 17 17 17.1 14-14c7.7-7.7 13.9-14.3 13.8-14.7-.4-1-55-39-56.8-39.5-.9-.2-2.2.8-3.3 2.6zM317.5 309l-44 44 75 75 75 75h5.8c18.3 0 42-10.9 57.2-26.4 14.9-15 25.5-38.8 25.5-56.9v-5.2l-74.8-74.8C396.1 298.6 362.3 265 362 265c-.3 0-20.3 19.8-44.5 44z"/></svg> 
+                        </th>
+                        <th>R</th>
+                        <th>B</th>
+                        <th>4s</th>
+                        <th>6s</th>
+                        <th>S/R</th>
+                    </tr>
+                </thead>
+                <tbody class="strikeboard">                
+                    <tr class="sp-id">
+                        <td><select style="width: 150px !important;" name="strike" id="strikeDropdown" class="form-select select"></select></td>
+                        <td class="sp-totalRuns cmRuns">0</td>
+                        <td class="sp-totalBalls cmtBall">0</td>
+                        <td class="sp-total4s">0</td>
+                        <td class="sp-total6s">0</td>
+                        <td class="sp-strikeRate">0.00</td>
+                    </tr>
+                    <tr class="nsp-id">
+                        <td><select style="width: 150px !important;" name="non_strike" id="nonstrikeDropdown" class="form-select select"></select></td>
+                        <td class="nsp-totalRuns cmRuns">0</td>
+                        <td class="nsp-totalBalls cmtBall">0</td>
+                        <td class="nsp-total4s">0</td>
+                        <td class="nsp-total6s">0</td>
+                        <td class="nsp-strikeRate">0.00</td>
+                    </tr>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bowling-player-stats">
+            <table class="table table-borderless mb-4 rounded overflow-hidden shadow-sm text-center">
+                <thead class="border-bottom">
+                    <tr>
+                        
+                        <th class="d-flex align-items-center">
+                            <span class="me-1">
+                                {% if match.batting_team_id == match.team1.id %}
+                                    {% with opposite_team=match.team2 %}
+                                        <img class="border rounded-circle" style="width: 30px; height:30px;" src="{{ opposite_team.logo.url }}" alt="{{ opposite_team.name }} Logo">
+                                    {% endwith %}
+                                {% else %}
+                                    {% with opposite_team=match.team1 %}
+                                        <img class="border rounded-circle" style="width: 30px; height:30px;" src="{{ opposite_team.logo.url }}" alt="{{ opposite_team.name }} Logo">
+                                    {% endwith %}
+                                {% endif %}
+                            
+                            </span> {% if match.batting_team_id == match.team1.id %} {{ match.team2.name }} {% else %} {{ match.team1.name }} {% endif %}
+                            <svg class="sm-icon ms-2 border-start ps-2" xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 512 512"><path d="M231.5 1c-46.7 4.8-91.5 22.9-131 52.9-12.8 9.7-36.9 33.8-46.6 46.6C6.2 163.2-10.3 236.7 6.5 311.6c3.5 15.3 11.3 38.1 18.1 52.3l5.5 11.5L58 347.5l28-28 10.7 10.8 10.8 10.7-30.4 30.4c-19.7 19.7-30.2 30.9-29.8 31.8.8 2.1 16.6 21.8 17.5 21.8C65.7 425 425 65.7 425 64.8c0-.9-19.7-16.7-21.8-17.5-.9-.4-12.1 10.1-31.8 29.8L341 107.5l-10.7-10.8L319.5 86l27.8-27.8c21.5-21.5 27.5-28.1 26.5-28.9-1.9-1.5-18.9-9-28.3-12.5-18.7-7-36.2-11.5-56-14.4-12.2-1.8-45.7-2.6-58-1.4zM304 144.5l-16 16-10.7-10.8-10.8-10.7 16-16 16-16 10.7 10.7 10.8 10.8-16 16zm-47.8 26.2c5.4 5.4 9.8 10.2 9.8 10.8 0 .6-7 8-15.5 16.5L235 213.5l-10.7-10.8-10.8-10.7 15.5-15.5c8.5-8.5 15.9-15.5 16.5-15.5.5 0 5.4 4.4 10.7 9.7zM203 224.5l10.5 10.5-15.5 15.5c-8.5 8.5-15.9 15.5-16.5 15.5-1.3 0-20.5-19.2-20.5-20.5 0-1 30-31.5 31-31.5.3 0 5.2 4.7 11 10.5zm-53 53 10.5 10.5-16 16-16 16-10.7-10.7-10.8-10.8 15.7-15.7c8.7-8.7 16-15.8 16.3-15.8.3 0 5.2 4.7 11 10.5zm116.7-10.7C167.9 365.6 87 446.8 87 447.2c0 .9 19.7 16.7 21.8 17.5.9.4 12.1-10.1 31.8-29.8l30.4-30.4 10.7 10.8 10.8 10.7-27.9 27.9-27.9 27.9 7.3 3.7c4.1 2 12.3 5.7 18.4 8 85.9 33.6 175.1 20.9 249.1-35.4 11.8-8.9 34.3-31.1 43.9-43.1 61.4-77 73.6-179 32-267l-5.5-11.4-27.9 27.9-28 28-10.7-10.8-10.8-10.7 30.4-30.4c19.7-19.7 30.2-30.9 29.8-31.8-.8-2.1-16.6-21.8-17.5-21.8-.4 0-81.6 80.9-180.5 179.8zM389 229.5l-16 16-10.7-10.8-10.8-10.7 16-16 16-16 10.7 10.7 10.8 10.8-16 16zm-47.8 26.2c5.4 5.4 9.8 10.2 9.8 10.8 0 .6-7 8-15.5 16.5L320 298.5l-10.7-10.8-10.8-10.7 15.5-15.5c8.5-8.5 15.9-15.5 16.5-15.5.5 0 5.4 4.4 10.7 9.7zM288 309.5l10.5 10.5-15.5 15.5c-8.5 8.5-15.9 15.5-16.5 15.5-1.3 0-20.5-19.2-20.5-20.5 0-1 30-31.5 31-31.5.3 0 5.2 4.7 11 10.5zm-53 53 10.5 10.5-16 16-16 16-10.7-10.7-10.8-10.8 15.7-15.7c8.7-8.7 16-15.8 16.3-15.8.3 0 5.2 4.7 11 10.5z"/></svg>
+                        </th>
+                        <th>O</th>
+                        <th>M</th>
+                        <th>R</th>
+                        <th>W</th>
+                        <th>ECON</th>
+                    </tr>
+                </thead>
+                <tbody id="playerScoreboardBody" class=" shadow-sm">
+                    <tr>
+                        <td><select style="width: 150px !important;" name="bowler" id="id_bowler" class="form-select select bowler"></select></td>
+                        <td class="bp-totalOvers">0</td>
+                        <td class="bp-maiden">0</td>
+                        <td class="bp-runSpent">0</td>
+                        <td class="bp-wicketTaken">0</td>
+                        <td class="bp-economy">0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="run-wrapper mb-3">
+            <div class="form-label">{{ form.runs.label }}</div>
+            <div class="run-selector d-flex gap-1 flex-wrap" id="id_runs">
+                {% for radio in form.runs %}
+                    <div class="rd-button">
+                        {{ radio.tag }}
+                        <label for="{{ radio.id_for_label }}" class="rounded-circle shadow-sm border">{{ radio.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if form.runs.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.runs.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="extras-wrapper mb-3">
+            <div class="form-label">{{ form.extras.label }}</div>
+            <div class="run-selector d-flex gap-2 flex-wrap" id="id_extras">
+                {% for radio in form.extras %}
+                    <div class="rd-button">
+                        {{ radio.tag }}
+                        <label for="{{ radio.id_for_label }}" class="rounded shadow-sm border p-2 px-3">{{ radio.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if form.extras.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.extras.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-footer d-flex justify-content-between">
+            <div class="wicket-box"><span class="btn btn-danger rounded-pill">Wicket<span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20" viewBox="0 0 32 32" fill="#fff"><path d="M16 13c-2 0-3 1-3 3s1 3 3 3 3-1 3-3S18 13 16 13zM6 13c-2 0-3 1-3 3s1 3 3 3 3-1 3-3S8 13 6 13zM26 13c-2 0-3 1-3 3s1 3 3 3 3-1 3-3S28 13 26 13z"></path></svg></span></span></div>
+
+            <div class="wicket-handler bg-white p-3 rounded border mt-2 d-none">
+                <div class="wicket-wrapper mb-3">
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div class="form-label">Wicket Type</div>
+                        <div class="wicket_by-wrapper mb-3">
+                            <div class="form-label">Fielder</div>
+                            {{ form.wicket_by }}
+                            {% if form.wicket_by.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.wicket_by.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="run-selector d-flex gap-2 flex-wrap" id="id_wicket">
+                        {% for radio in form.wicket %}
+                            <div class="rd-button">
+                                {{ radio.tag }}
+                                <label for="{{ radio.id_for_label }}" class="rounded shadow-sm border p-2 px-3">{{ radio.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.wicket.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.wicket.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="out_player-wrapper mb-3 d-none">
+                    <div class="d-flex gap-3">
+                        <div class="col">
+                            <label class="whoIsOutLabel">Who is out?</label>
+                            {{ form.out_player }}
+                        </div>
+                        {% if form.out_player.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.out_player.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div id="changePlayer" class="col">
+                            <label><span class="ot-player">Replace by</span></label>
+                            <select name="additional" id="additionalDropdown" class="form-select select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn btn-danger w-100" id="strikeChanger">Change Strike</div>
+            </div>
+            <div class="col-8 formSubmit">
+                <input type="submit" value="Update Scores" id="submitScoreButton" class="btn btn-primary w-100">
+            </div> 
+        </div> 
+    </form>
+</div>

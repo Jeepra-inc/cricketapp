@@ -1,0 +1,57 @@
+<div class="card my-3">
+    <div class="p-2 bg-gray border border-bottom-0 bg-dark text-white"><span class="f6">Match Details</span></div>
+    <table class="table table-bordered mb-0">
+        <tbody>
+            <tr>
+                <td colspan="2">
+                    <a href="#" title="{{match_location}}" class="icon-link">{{match_location}}</a>
+                </td>
+            </tr>
+            <tr>
+                <td scope="col">Toss</td>
+                <td scope="col">{{match_toss_winner}}, elected to {{match_toss_decision}} first</td>
+            </tr>
+            <tr>
+                <td scope="col">Series</td>
+                <td scope="col">
+                    <a href="#" class="icon-link">{{league_name}}</a>
+                </td>
+            </tr>
+            <tr>
+                <td scope="col">Season</td>
+                <td class="ds-min-w-max ds-text-typo">
+                    {{ match.date|date:"Y" }}
+                </td>
+            </tr>
+            <tr>
+                <td scope="col">Match number</td>
+                <td scope="col">
+                    {{league_format}} no. {{match_number}}{% if match_number  == 1  %}st {% elif match_number  == 2 %} nd {% elif match_number  == 3 %} {% else %}th{% endif %} 
+
+                </td>
+            </tr>
+            <tr>
+                <td scope="col">Match Time</td>
+                <td scope="col">12:00 start</td>
+            </tr>
+            <tr>
+                <td scope="col">Match days</td>
+                <td scope="col">{{ match.date|date:"F j, Y" }} - {% if match.match_type  == 1  %} Day {% else %}Day & Night{% endif %}, ({% if league_format  == 'T20'  %}20{% else %}50{% endif %}-over match)</td>
+            </tr>
+            <tr>
+                <td scope="col">Umpires</td>
+
+                <td scope="col">
+                    <a href="#" class="icon-link">
+                        <ul>
+                        {% for umpire in umpires %}
+                            <li>{{ umpire.name }}</li>
+                        {% endfor %}
+                        </ul>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+</div>

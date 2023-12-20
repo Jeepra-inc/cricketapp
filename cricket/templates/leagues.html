@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leagues</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .matches-list {
+            display: none;
+        }
+        .toggle {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leagues</h1>
+    <ul>
+        {% for league in leagues %}
+            <li class="league">
+                <span class="toggle">[+]</span> {{ league.name }}
+                <ul class="matches-list">
+                    {% for match in league.matches.all %}
+                        <li>
+                            {{ match.match_name }} <br>
+                            <a href="{% url 'manage_scores' match.id %}">Manage Scores</a><br>
+                            <a href="{% url 'view_stats' match.id %}">View Stats</a>
+                        </li><hr>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        $('.toggle').click(function() {
+            var $matchesList = $(this).parent().find('.matches-list');
+            if ($matchesList.is(':visible')) {
+                $matchesList.hide();
+                $(this).text('[+]');
+            } else {
+                $matchesList.show();
+                $(this).text('[-]');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{% load static %}
+<!-- manage_scores.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Manage Scores</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/css/view.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/vendor/css/select2.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/vendor/css/bootstrap.css' %}">
+        <script src="{% static 'cricket/vendor/js/tippy-core.js' %}"></script>
+        <script src="{% static 'cricket/vendor/js/tippy.js' %}"></script>
+    </head>
+    <body>
+        
+        <!-- Accessing the match_format from the associated league -->
+        <div class="py-3 text-center mb-3 border-bottom position-relative">
+            <h1>Manage Scores for {{ match.match_name }}</h1> 
+            <h5>
+                {% if associated_league %}
+                    <p>Match Format: {{ associated_league.match_format }}</p>
+                {% else %}
+                    <p>No associated league found for this match.</p>
+                {% endif %}
+            </h5>
+            <span class="position-absolute top-0 end-0 m-3 border p-0 px-2 text-uppercase rounded-pill d-flex align-items-center live"><span class="livedot me-1"></span><small>live</small></span>
+        </div>
+        <div class="bp-test d-none"></div>
+        <div class="container mb-5">
+            <div class="row">
+                {% include 'partials/liveadmin/score_updater.html' %}
+                <div class="col-md-6">
+                    {% include 'partials/liveadmin/inning_info.html' %} 
+                    {% include 'partials/liveadmin/notes.html' %}
+                    {% include 'partials/liveadmin/details.html' %}
+                    {% include 'partials/liveadmin/out_players.html' %}
+                    {% include 'partials/liveadmin/per_ball_stats.html' %}            
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script src="{% static 'cricket/vendor/js/jquery.js' %}"></script>
+    <script src="{% static 'cricket/vendor/js/select2.js' %}"></script>
+    <script>
+        // Data Variable for view.js
+        var selectedTeam = "{{ match.batting_team_id }}";     
+            oppositeTeam = (selectedTeam === '{{ match.team1.id }}') ? '{{ match.team2.id }}' : '{{ match.team1.id }}';
+            selectedMatch = "{{ match.id }}"; 
+            defaultBowlerId = '{{ match.bowler_id }}'; 
+            defaultStrike = "{{ match.striker.id }}"; 
+            defaultNonStrike = "{{ match.non_striker.id }}";
+            matchFormat = "{{ associated_league.match_format }}";
+            inning = "{{ match.inning }}";
+            editIcon = '<svg  xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="none" viewBox="0 0 24 24"><path stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.9445 9.1875L14.9445 5.1875M18.9445 9.1875L13.946 14.1859C13.2873 14.8446 12.4878 15.3646 11.5699 15.5229C10.6431 15.6828 9.49294 15.736 8.94444 15.1875C8.39595 14.639 8.44915 13.4888 8.609 12.562C8.76731 11.6441 9.28735 10.8446 9.946 10.1859L14.9445 5.1875M18.9445 9.1875C18.9445 9.1875 21.9444 6.1875 19.9444 4.1875C17.9444 2.1875 14.9445 5.1875 14.9445 5.1875M20.5 12C20.5 18.5 18.5 20.5 12 20.5C5.5 20.5 3.5 18.5 3.5 12C3.5 5.5 5.5 3.5 12 3.5"/></svg>'
+
+    </script>
+    <script src="{% static 'cricket/js/view.js' %}"></script>
+    <script src="{% static 'cricket/js/scripts.js' %}"></script>
+    <script src="{% static 'cricket/js/tooltips.js' %}"></script>
+</html>
+
+

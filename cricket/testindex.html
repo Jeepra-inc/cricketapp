@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Slider</title>
+  <style>
+    .tabs {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .slider {
+      height: 3px;
+      background-color: #3498db;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      transition: 0.3s ease-in-out;
+    }
+
+    .content {
+      display: none;
+    }
+
+    .active-content {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<ul class="tabs">
+  <li class="tab" data-tab="tab1">Tab 1</li>
+  <li class="tab" data-tab="tab2">Tab 2</li>
+  <li class="tab" data-tab="tab3">Tab 3</li>
+  <div class="slider"></div>
+</ul>
+
+<div id="tab1" class="content active-content">
+  <p>Content for Tab 1</p>
+</div>
+
+<div id="tab2" class="content">
+  <p>Content for Tab 2</p>
+</div>
+
+<div id="tab3" class="content">
+  <p>Content for Tab 3</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.tab').click(function () {
+      // Hide all content divs
+      $('.content').removeClass('active-content');
+
+      // Show the content of the clicked tab
+      var tabId = $(this).data('tab');
+      $('#' + tabId).addClass('active-content');
+
+      // Move the slider to the clicked tab
+      var tabPosition = $(this).position().left;
+      $('.slider').css('left', tabPosition);
+    });
+  });
+</script>
+</body>
+</html>

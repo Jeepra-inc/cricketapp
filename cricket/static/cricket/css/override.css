@@ -1,0 +1,9 @@
+:root, [data-bs-theme=light] {
+    --bs-border-color: #edeef0 !important;
+    --bs-danger-rgb: 228,66,66 !important;
+    --bs-light-rgb: 227,227,227 !important
+}
+
+.fs-6 {
+    font-size: .875rem!important;
+}

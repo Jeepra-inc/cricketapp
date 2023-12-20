@@ -1,0 +1,86 @@
+<!-- team_detail.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ team.name }} Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'cricket/css/override.css' %}">
+</head>
+<body>
+    <div class="container">
+    <h1>Team {{ team.name }} Details</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div>
+                <h5>Profile</h5>
+                <div class="mb-3">{{ team.team_profile }}</div>
+            </div>
+            <h5>Matches:</h5>
+            <div class="list-group">
+                {% for match in team_matches %}
+                    <div class="list-group-item d-flex p-0">
+                        <div class="match-date col-md-2 p-2">{{ match.date|date:"D, d M 'y" }}</div>
+                        <div class="match-info col-md-8 border-start border-end">
+                            <div>
+                                <div class="p-2 px-3 border-bottom">[Live], 1st Match, {{ match.location.name }}, {{ match.location.city }}, {{ match.leagues.name }}</div>
+                                <div class="p-2 px-3">
+                                    <div class="team-1 d-flex align-items-center justify-content-between">
+                                        <div class="team-name d-flex align-items-center">
+                                            <img class="sm-icon" src="{{ match.team1.logo.url}}" alt="{{ match.team1.name }}" />
+                                            <span>{{ match.team1.name }}</span>
+                                        </div>
+                                        <div class="team-score">
+                                            182
+                                        </div>
+                                    </div>
+                                    <div class="team-2 d-flex align-items-center justify-content-between">
+                                        <div class="team-name d-flex align-items-center">
+                                            <img class="sm-icon" src="{{ match.team2.logo.url}}" alt="{{ match.team2.name }}" />
+                                            <span>{{ match.team2.name }}</span>
+                                        </div>
+                                        <div class="team-score">
+                                            <div class="d-flex align-items-center">
+                                                <span>(43.2/50 ov, T:182) </span>
+                                                <span>185/7</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border-top p-2 px-3">
+                                    <span>Nepal won by 3 wickets (with 40 balls remaining)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="match-summary col-md-2 d-flex flex-wrap align-items-center p-2">
+                            <div>
+                                <p>Summary</p>
+                                <p>Series Home</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <h2>Players:</h2>
+            <a href="{% url 'players_page' team.id %}">
+                <button>Show Players</button>
+            </a>
+
+        </div>
+    </div>
+
+</div>
+        
+    
+
+</body>
+</html>
+
+<style>
+    .sm-icon {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+    }
+</style>

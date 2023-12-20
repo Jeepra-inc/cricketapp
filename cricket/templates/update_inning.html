@@ -1,0 +1,65 @@
+{% load static %}
+<!-- manage_scores.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Manage Scores</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/css/view.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/vendor/css/select2.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'cricket/vendor/css/bootstrap.css' %}">
+    </head>
+  <h1 class="text-center">Update Inning: {{ match.match_name }}</h1>
+  <div class="hidden-fields d-none">
+    <input type="hidden" name="bowler_id" id="bowlerIdInput" value="{{ match.bowler_id }}">
+    <input type="text" name="match" value="{{ match.match_name }}" readonly hidden>
+    <input type="text" name="team" id="teamInput" readonly hidden>
+    <input type="text" name="out_player_value" id="outPlayerValue" readonly hidden>
+</div>
+  <form method="post" id="liveScoreForm" class="updateInningForm" data-inning="2" >
+    {% csrf_token %}
+    <div class="card w-50 mx-auto p-4">
+      <div class="inning_bating_team">
+        <h5>Batting Team</h5>
+        <div class="d-flex gap-3">
+          <div class="col">
+            <p class="mb-0">On Strike</p>
+            <select style="width: 150px !important;" name="strike" id="strikeDropdown" class="form-select select w-100"></select>
+          </div>
+          <div class="col">
+            <p class="mb-0">Non Strike</p>
+            <select style="width: 150px !important;" name="non_strike" id="nonstrikeDropdown" class="form-select select w-100"></select>
+          </div>
+        </div>
+      </div>
+      <div class="inning_bating_team mt-3">
+        <h5>Batting Team</h5>
+        <p class="mb-0">Bowling Player</p>
+        <select style="width: 150px !important;" name="bowler" id="id_bowler" class="form-select select bowler"></select>
+      </div>
+      <input type="text" value="2" name="inning" id="inningID" readonly hidden>
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary w-100 mt-3">Start Second Inning</button>
+    </div>
+  </form>
+  <div id="resultMessage"></div>
+
+
+  <script src="{% static 'cricket/vendor/js/jquery.js' %}"></script>
+    <script src="{% static 'cricket/vendor/js/jquery.js' %}"></script>
+    <script src="{% static 'cricket/vendor/js/select2.js' %}"></script>
+    <script>
+        // Data Variable for view.js
+        var selectedTeam = "{{ match.batting_team_id }}";     
+        var oppositeTeam = (selectedTeam === '{{ match.team1.id }}') ? '{{ match.team2.id }}' : '{{ match.team1.id }}';
+        var oppositeTeamName = (selectedTeam === '{{ match.team1.id }}') ? '{{ match.team2 }}' : '{{ match.team1 }}';
+        var selectedMatch = "{{ match.id }}"; 
+        var defaultBowlerId = '{{ match.bowler_id }}'; 
+        var defaultStrike = "{{ match.striker.id }}"; 
+        var defaultNonStrike = "{{ match.non_striker.id }}";
+        var matchFormat = "{{ associated_league.match_format }}";
+        var inning = "{{ match.inning }}";
+    </script>
+    <script src="{% static 'cricket/js/update-inning.js' %}"></script>
+</html>
+
+

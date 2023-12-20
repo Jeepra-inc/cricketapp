@@ -1,0 +1,697 @@
+<!-- manage_scores.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Scores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+    <h1 class="py-3 text-center">Manage Scores for {{ match.match_name }}</h1>
+    <hr>
+    <br>
+    <div class="container">
+
+        <h1>All Live Scores</h1>
+
+        {% for score in live_scores %}
+            <p>{{ score.timestamp }} - {{ score.match }} - {{ score.team }} - {{ score.bowler }} - {{ score.runs }} - {{ score.extras }} - {{ score.wicket }} - {{ score.out_player }}</p>
+        {% endfor %}
+
+    <div class="row">
+        <div class="col-md-6 card p-4 bg-dark text-white">
+            <form method="post" id="liveScoreForm">
+                {% csrf_token %}
+                <input type="text" name="match" value="{{ match.match_name }}" readonly hidden>
+                <div>
+                    <input type="text" name="team" id="teamInput" readonly hidden>
+                </div>
+                <div class="d-flex gap-2 border-bottom pb-3 mb-4">
+                    <div class="border-end pe-3 me-2">
+                        <div class="mb-2">Batting Team: <strong for="teamInput" id ="teamName"></strong></div>
+                        <div>
+                            <label for="id_bowler">Select Bowler:</label>
+                            <select name="bowler" id="id_bowler" class="form-select select"></select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="mb-2">Batting Team: <strong for="teamInput" id ="teamName"></strong></div>
+                        <div>
+                            <label for="id_bowler">Strike:</label> 
+                            <select name="strike" id="strikeDropdown" class="form-select select"></select>
+                        </div>
+                        <div>
+                            <label for="nonstrikeDropdown">Non Strike:</label>
+                            <select name="non-strike" id="nonstrikeDropdown" class="form-select select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="spc-button">
+                    {{ form.as_p }}
+                </div>
+                 <!-- Add a new select element for the selected players dropdown -->
+                 <div id="changePlayer" >
+                    <div class="d-flex mb-3">
+                        <div>
+                            <label for="selectedPlayers">Who is out ?</label>
+                            <select name="selectedPlayers" id="selectedPlayers" class="form-select select"></select>
+                        </div>
+
+                        <div class="ms-3">
+                            <label for="id_additional">Additional Field:</label> 
+                            <select name="additional" id="additionalDropdown" class="form-select select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-top pt-4 mt-4">
+                    <input type="submit" value="Update Scores" id="submitScoreButton" class="btn btn-primary w-100 ">
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="bg-dark p-3 rounded text-white mb-3">
+                <h3>Out Players</h3>
+                <ul id="outPlayersList" class="d-flex gap-2 flex-wrap"> </ul>
+            </div>
+            <div class="bg-dark p-3 rounded text-white">
+                <h3>Bowler's Over</h3>
+                <div id="bowlersInfoList"></div>
+            </div>
+            <div id="liveScoreContainer" class="d-flex"></div>
+            <div>
+                <ul>
+                    <li>1: Fix on reload emty issue on strike and non strike dopdwon</li>
+                    <li>2: When Clicking on extras WD, NB reset the run to one and don't change the strike</li>
+                    <li>3: Once noball is selected another option allow as free hit where ball will be not counted as legal ball</li>
+                    <li><s>4: hide out players from additional field</s></li>
+                    <li><s>5: fetch list of out players</s></li>
+                    <li><s>6: fetch balls delivered by each bowlers</s></li>
+                    <li>7: show livescore on this template</li>
+                    <li>8: show individual entries list with edit button on each entry</li>
+                    <li>9: if playing team loose all 9 wikect then change the batting team to bowling and bowling to batting team</li>
+                    <li>10: if over is completed then change same as point 9</li>
+                </ul>
+            </div>
+        </div>
+</div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<script>
+   $(document).ready(function () {
+    var teamDropdown = $('#teamInput');
+    var id_bowler = $('#id_bowler');
+    var outDropdown = $('#outPlayers');
+    var strikeDropdown = $('#strikeDropdown');
+    var nonstrikeDropdown = $('#nonstrikeDropdown')
+    var teamInput = $('#teamInput');
+    var battingTeamActive = $('#teamName')
+
+    // Function to extract match ID from the current URL
+    function getMatchIdFromUrl() {
+        // Get the current URL
+        var currentUrl = window.location.href;
+
+        // Use a regular expression to extract the match ID from the URL
+        var matchIdMatch = currentUrl.match(/\/cricket\/manage_scores\/(\d+)\/$/);
+        // Check if a match ID is found
+        if (matchIdMatch && matchIdMatch.length === 2) {
+            // Return the match ID as a number
+            return parseInt(matchIdMatch[1], 10);
+        } else {
+            // Return a default value or handle the case where no match ID is found
+            return null;
+        }
+    }
+    // Get the match ID
+    var match_id = getMatchIdFromUrl();
+
+    // Function to set a value in local storage
+    function setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            console.error('Error setting local storage:', e);
+        }
+    }
+
+    // Function to get a value from local storage
+    function getLocalStorage(key) {
+        try {
+            const value = localStorage.getItem(key);
+            return value ? JSON.parse(value) : null;
+        } catch (e) {
+            console.error('Error getting local storage:', e);
+            return null;
+        }
+    }
+
+    // Function to fetch and populate teams based on the selected match
+    function fetchAndPopulateTeams() {
+        var selectedMatch = "{{ match.id }}";  // Pre-selected match from the template
+
+        $.ajax({
+            url: '/cricket/get_teams/',
+            data: { 'match': selectedMatch },
+            success: function (data) {
+                // Check if the response contains the expected data
+                if ('batting_team' in data) {
+                    var battingTeamName = data.batting_team;
+                    // Assuming that 'batting_team' is the key in your response
+                    var battingTeam = data.batting_team_id;
+                    battingTeamActive.text(battingTeamName)
+                    // Set the value of the non-editable input
+                    teamInput.val(battingTeam);
+                } else {
+                    console.error('Error: batting_team not found in the response');
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                // Handle errors
+                console.error('Error fetching team data:', thrownError);
+            }
+        });
+    }
+    fetchAndPopulateTeams();
+
+    
+// Function to fetch and populate bowlers based on the selected team
+function fetchAndPopulateBowlers() {
+    setTimeout(function() {
+        // Assuming matchData is a JavaScript variable holding the match data
+        var selectedBowlerId = '{{ match.bowler.id }}';  // Replace with the actual field containing the bowler ID
+        var id_bowler = $('#id_bowler');  // Assuming id_bowler is the ID of your select element
+
+        // Make an AJAX request to fetch bowlers based on the selected team
+        $.ajax({
+            url: '/cricket/get_bowlers/',  // Replace with the actual URL to fetch bowlers based on the selected team
+            data: { 'team': selectedTeam },
+            success: function (data) {
+                id_bowler.empty();
+
+                // Add a default option
+                id_bowler.append($('<option>', {
+                    value: '',
+                    text: 'Select Bowler'  // Adjust the text accordingly
+                }));
+
+                // Populate bowlers from the AJAX response
+                $.each(data, function (key, value) {
+                    id_bowler.append($('<option>', {
+                        value: key,
+                        text: value
+                    }));
+                });
+
+                // Set the selected value from the match data
+                if (selectedBowlerId) {
+                    id_bowler.val(selectedBowlerId);
+                }
+            }
+        });
+    }, 10);
+}
+
+// Trigger the change event when the page loads
+fetchAndPopulateBowlers();
+
+
+
+
+    // Function to fetch and populate bowlers based on the selected team
+    function fetchAndPopulatePlayers() {
+        setTimeout(function() {
+            var selectedTeam = $('#teamInput').val();
+
+            // Make an AJAX request to fetch bowlers based on the selected team
+            $.ajax({
+                url: '/cricket/get_players/',  // Replace with the actual URL to fetch bowlers based on the selected team
+                data: { 'team': selectedTeam },
+                success: function (data) {
+                    strikeDropdown.empty();
+                    nonstrikeDropdown.empty();
+
+                    // Add a default option
+                    strikeDropdown.append($('<option>', {
+                        value: '',
+                        text: 'Strike Player'  // Adjust the text accordingly
+                    }));
+
+                    // Add a default option
+                    nonstrikeDropdown.append($('<option>', {
+                        value: '',
+                        text: 'Non Strike Player'  // Adjust the text accordingly
+                    }));
+
+                    // Add a default option
+                    $('#additionalDropdown').append($('<option>', {
+                        value: '',
+                        text: 'add player'  // Adjust the text accordingly
+                    }));
+
+                    
+
+
+                    // Populate bowlers from the AJAX response
+                    $.each(data, function (key, value) {
+                        strikeDropdown.append($('<option>', {
+                            value: key,
+                            text: value
+                        }));
+                    });
+
+                    // Populate bowlers from the AJAX response
+                    $.each(data, function (key, value) {
+                        
+                        nonstrikeDropdown.append($('<option>', {
+                            value: key,
+                            text: value
+                        }));
+                    });
+
+                    // Populate bowlers from the AJAX response
+                    $.each(data, function (key, value) {
+                        
+                        $('#additionalDropdown').append($('<option>', {
+                            value: key,
+                            text: value
+                        }));
+                    });
+
+
+                    // Set the selected value from local storage
+                var selectedStrike = getLocalStorage('selectedStrike');
+                if (selectedStrike) {
+                    strikeDropdown.val(selectedStrike);
+                }
+
+                var selectedNonStrike = getLocalStorage('selectedNonStrike');
+                if (selectedNonStrike) {
+                nonstrikeDropdown.val(selectedNonStrike);
+                }
+                }
+            });
+            
+        }, 10);
+    }
+
+
+
+// Function to fetch and populate out players based on the selected team
+function fetchAndPopulateOutPlayers() {
+    setTimeout(function() {
+        var selectedTeam = $('#teamInput').val();
+
+        // Make an AJAX request to fetch out players based on the selected team
+        $.ajax({
+            url: '/cricket/get_out_players/',
+            data: { 'team': selectedTeam },
+            success: function (data) {
+                // Assuming you have an HTML element with id 'outPlayersList' to display the out players
+                var outPlayersList = $('#outPlayersList');            
+                // Clear the existing list
+                outPlayersList.empty();
+
+                // Display the list of out players with their names and wicket values
+                $.each(data.players, function (key, player) {
+                    var listItem = $('<li class="p-1 px-2 bg-danger text-white rounded"></li>');
+                    listItem.text(player.name + ' - Wicket: ' + player.wicket);
+                    outPlayersList.append(listItem);
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching out players:', error);
+            }
+        });
+    }, 10);
+}
+
+// Call the function to fetch and display out players
+fetchAndPopulateOutPlayers();
+
+
+
+
+
+    strikeDropdown.change(function () {
+        setLocalStorage('selectedStrike', strikeDropdown.val());
+    });
+
+    nonstrikeDropdown.change(function () {
+        setLocalStorage('selectedNonStrike', nonstrikeDropdown.val());
+    });
+
+    // Event listener for the team dropdown change event
+    fetchAndPopulatePlayers()
+    // Initialize variables to store the initial selections
+    var initialStrike = getLocalStorage('selectedStrike');
+    var initialNonStrike = getLocalStorage('selectedNonStrike');
+
+    $('input[name="runs"]').change(function () {
+        // Get the selected run value
+        var selectedRun = $('input[name="runs"]:checked').val();
+
+        // Check if the run is 1, 3, or 5
+        if (selectedRun === '1' || selectedRun === '3' || selectedRun === '5') {
+            // Swap the players based on the initial selection
+            $('#strikeDropdown').val(initialNonStrike);
+            $('#nonstrikeDropdown').val(initialStrike);
+        } else if (selectedRun === '0' || selectedRun === '2' || selectedRun === '4' || selectedRun === '6') {
+            // Swap the players back to the initial selection
+            $('#strikeDropdown').val(initialStrike);
+            $('#nonstrikeDropdown').val(initialNonStrike);
+        }
+
+        // Update local storage values
+        setLocalStorage('selectedStrike', $('#strikeDropdown').val());
+        setLocalStorage('selectedNonStrike', $('#nonstrikeDropdown').val());
+    });
+
+    // Event listener for the extras radio buttons change event
+    $('input[name="extras"]').change(function () {
+        // Get the selected extras value
+        var selectedExtras = $('input[name="extras"]:checked').val();
+
+        if (selectedExtras === 'wide') {
+            // Reset the strike and non-strike dropdowns to their initial values
+            $('#strikeDropdown').val(initialStrike);
+            $('#nonstrikeDropdown').val(initialNonStrike);
+
+            // Update local storage values
+            setLocalStorage('selectedStrike', initialStrike);
+            setLocalStorage('selectedNonStrike', initialNonStrike);
+        }
+        // Add more conditions if needed for other types of extras
+    });
+
+
+    // AJAX form submission
+    $('#submitScoreButton').click(function () {
+        event.preventDefault();
+
+        // Extract selected values from dropdowns
+        //var selectedBowler = $('#id_bowler').val();
+        var selectedStrike = $('#strikeDropdown').val();
+        var selectedNonStrike = $('#nonstrikeDropdown').val();
+
+        // Assign values to the corresponding form fields
+        //$('#liveScoreForm').find('[name=bowler]').val(selectedBowler);
+        $('#liveScoreForm').find('[name=strike]').val(selectedStrike);
+        $('#liveScoreForm').find('[name=non_strike]').val(selectedNonStrike);
+
+        $.ajax({
+            url: '/cricket/manage_scores/{{ match.id }}/',  // Replace with the actual URL to handle form submission
+            type: 'post',
+            data: $('#liveScoreForm').serialize(),  // Serialize the form data
+            success: function (data) {
+                fetchLiveScoreData({{ match.id }});
+                // Show a success alert
+                alert('Scores updated successfully!');
+                console.log('Serialized Form Data:', $('#liveScoreForm').serialize());
+                fetchAndDisplayBowlersInfo();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Error updating scores');
+            }
+        });
+    });
+
+    // Function to fetch live score data for the specific team
+    // Update the function to accept matchId
+    function fetchLiveScoreData(matchId) {
+        //console.log('Fetching live score data for match:', matchId);
+
+        // Make an AJAX request to fetch live score data for the specified match ID
+        $.ajax({
+            url: '/cricket/get_live_score/',  // Replace with the actual URL to fetch live score data
+            data: { 'match': matchId },
+            success: function (data) {
+            // Check if the response contains live_score_data
+            if ('live_score_data' in data) {
+                var liveScoreData = data.live_score_data;
+
+                // Display live score data in HTML
+                var liveScoreContainer = $('#liveScoreContainer');  // Replace with the ID of the container where you want to display the data
+
+                // Clear previous content
+                liveScoreContainer.empty();
+                
+                // Loop through live score data and append it to the container
+                //for (var i = 0; i < liveScoreData.length; i++) {
+                // Loop through live score data and append the last 12 entries to the container
+                for (var i = Math.max(0, liveScoreData.length - 6); i < liveScoreData.length; i++) {
+                    var score = liveScoreData[i];
+                    var extras = score.extras.substring(0, 200);
+                    var scoreHtml = '<p class="me-1">' + score.runs + ' ' + extras + '</p> | ';
+                    liveScoreContainer.append(scoreHtml);
+                }
+            } else {
+                console.error('Error: live_score_data not found in the response');
+            }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                // Handle errors
+                console.error('Error fetching live score data:', thrownError);
+            }
+        });
+    }
+
+    // Call this function with the desired match ID
+    fetchLiveScoreData(1);  // Replace 1 with the actual match ID
+
+
+    // Function to fetch and populate the selected players dropdown
+
+    function fetchAndPopulateSelectedPlayersDropdown() {
+        setTimeout(function () {
+            // Get the current values of strike and non-strike dropdowns
+            var selectedStrikeId = $('#strikeDropdown').val();
+            var selectedNonStrikeId = $('#nonstrikeDropdown').val();
+
+            // Fetch corresponding player names based on player IDs
+            var selectedStrikeName = $('#strikeDropdown option:selected').text();
+            var selectedNonStrikeName = $('#nonstrikeDropdown option:selected').text();
+
+            // Create an array to hold the selected players
+            var selectedPlayers = [];
+
+            // Add the selected players to the array if they are not empty
+            if (selectedStrikeId) {
+                selectedPlayers.push({
+                    id: selectedStrikeId,
+                    name: selectedStrikeName
+                });
+            }
+
+            if (selectedNonStrikeId) {
+                selectedPlayers.push({
+                    id: selectedNonStrikeId,
+                    name: selectedNonStrikeName
+                });
+            }
+
+            //console.log('Selected Strike:', selectedStrikeId, selectedStrikeName);
+            //console.log('Selected Non-Strike:', selectedNonStrikeId, selectedNonStrikeName);
+            //console.log('Selected Players:', selectedPlayers);
+
+            // Populate the selected players dropdown
+            var selectedPlayersDropdown = $('#selectedPlayers');
+            selectedPlayersDropdown.empty();
+
+            // Add a default option
+            selectedPlayersDropdown.append($('<option>', {
+                value: '',
+                text: 'Select Player'
+            }));
+
+            // Populate selected players from the array
+            for (var i = 0; i < selectedPlayers.length; i++) {
+                selectedPlayersDropdown.append($('<option>', {
+                    value: selectedPlayers[i].id,
+                    text: selectedPlayers[i].name
+                }));
+            }
+        }, 100);
+    }
+
+    // Call the function to populate the selected players dropdown when the page loads
+    $(document).ready(function () {
+        fetchAndPopulateSelectedPlayersDropdown();
+
+        // Update the function to be triggered on strike and non-strike dropdown change
+        $('#strikeDropdown, #nonstrikeDropdown').change(function () {
+            // Fetch and populate the selected players dropdown
+            fetchAndPopulateSelectedPlayersDropdown();
+        });
+    });
+
+
+    //off players after selection
+    $("#strikeDropdown").change(function () {
+        var selectedValue = $(this).val();
+        $("#nonstrikeDropdown option").show(); // Show all options
+        if (selectedValue !== "") {
+          $("#nonstrikeDropdown option[value='" + selectedValue + "']").hide();
+        }
+      });
+
+      $("#nonstrikeDropdown").change(function () {
+        var selectedValue = $(this).val();
+        $("#strikeDropdown option").show(); // Show all options
+        if (selectedValue !== "") {
+          $("#strikeDropdown option[value='" + selectedValue + "']").hide();
+        }
+      });
+      
+
+// Event listener for the additional field dropdown change event
+$('#additionalDropdown').change(function () {
+    // Save the selected value to local storage
+    setLocalStorage('selectedAdditional', $(this).val());
+});
+
+
+/// Variable to store the selected player from "selectedPlayers" dropdown
+var selectedPlayersValue = '';
+
+// Event listener for the selected players dropdown change event
+$('#selectedPlayers').change(function () {
+    // Get the selected player ID
+    selectedPlayersValue = $(this).val();
+});
+
+// Event listener for the "Additional Field" dropdown change event
+$('#additionalDropdown').change(function () {
+    // Get the selected player from "Additional Field" dropdown
+    var additionalFieldValue = $(this).val();
+
+    // Check if the selected player from "selectedPlayers" exists in either strike or non-strike dropdown
+    if ($('#strikeDropdown').val() === selectedPlayersValue) {
+        // Update the strike player dropdown to the "Additional Field" selected player
+        $('#strikeDropdown').val(additionalFieldValue).trigger('change'); // Trigger change event
+    } else if ($('#nonstrikeDropdown').val() === selectedPlayersValue) {
+        // Update the non-strike player dropdown to the "Additional Field" selected player
+        $('#nonstrikeDropdown').val(additionalFieldValue).trigger('change'); // Trigger change event
+    }
+});
+
+// Reset selectedPlayersValue when the strike or non-strike dropdown changes
+$('#strikeDropdown, #nonstrikeDropdown').change(function () {
+    selectedPlayersValue = '';
+});
+
+
+
+// Event listener for the "Wicket" dropdown change event
+$('#id_wicket').change(function () {
+    // Get the selected value
+    var wicketValue = $(this).val();
+
+    // Check if the selected value is 'not_out'
+    if (wicketValue !== 'not_out') {
+        // If not 'not_out', hide the 'changePlayer' div
+        $('#changePlayer').show();
+    } else {
+        // If 'not_out', show the 'changePlayer' div
+        $('#changePlayer').hide();
+    }
+});
+
+// Trigger the change event on page load to check the initial value
+$('#id_wicket').trigger('change');
+
+$('#selectedPlayers').change(function () {
+    // Get the selected player from "Who is out?" dropdown
+    var selectedOutPlayer = $(this).val();
+
+    // Update the "Out Player" dropdown with the selected player
+    $('#id_out_player').val(selectedOutPlayer);
+});
+
+
+$('.select').select2();
+
+
+
+function fetchAndDisplayBowlersInfo() {
+    var matchId = getMatchIdFromUrl();
+
+    // Make an AJAX request to fetch bowlers' information for the match
+    $.ajax({
+        url: '/cricket/get_bowler_info/' + matchId + '/',
+        success: function (data) {
+            // Assuming you have an HTML element with id 'bowlersInfoList' to display the bowlers' information
+            var bowlersInfoList = $('#bowlersInfoList');
+
+            // Clear the existing list
+            bowlersInfoList.empty();
+
+            // Display the list of bowlers' information
+            $.each(data.bowlers_info, function (index, bowler) {
+                var overs = Math.floor(bowler.legal_balls / 6) + ((bowler.legal_balls % 6) / 10);  // Adjust the overs calculation
+                var listItem = $('<div class="p-1 px-2 text-white rounded"></div>');
+                listItem.text(bowler.bowler_name + ' - Overs: ' + overs.toFixed(1));
+                bowlersInfoList.append(listItem);
+            });
+        },
+        error: function (error) {
+            console.error('Error fetching bowlers\' information:', error);
+        }
+    });
+}
+
+// Call the function to fetch and display bowlers' information
+fetchAndDisplayBowlersInfo();
+
+
+
+    });
+
+    
+</script>
+<style>
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+    }
+
+     /* Hide the default radio button */
+    .spc-button div input[type="radio"],
+    label[for="id_out_player"] {
+        display: none;
+    }
+
+    /* Style the label to resemble a button */
+    .spc-button div label {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF; /* Button background color */
+        color: #fff; /* Button text color */
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Change button color on hover */
+    .spc-button div label:hover {
+        background-color: #0056b3; /* Hover color */
+    }
+
+    /* Style for checked (selected) radio button */
+    .spc-button div input[type="radio"]:checked + label {
+        background-color: #0056b3; /* Checked color */
+    }
+
+    #id_extras {
+        border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important;
+        padding-bottom: 1.5rem!important;
+    }
+    
+</style>
+</html>
+
+

@@ -1,0 +1,28 @@
+<h5>{{ match.inning }}<small>st</small> Inning</h5>
+<div class="d-flex justify-content-between align-items-center border px-2 p-1 rounded shadow-sm mb-2 bg-success text-white">
+    <div class="d-flex align-items-center">
+        <span class="batting-team-logo me-2"><img class="border rounded-circle" style="width: 30px; height:30px;"  src="{{ match.batting_team.logo.url }}" alt="{{ match.batting_team.name }} Logo"> </span>
+        <h6 class="mb-0">{{ match.batting_team }}</h6>
+    </div>
+    <div class="d-flex border p-0 px-2 rounded-pill shadow-sm" >
+        <strong><span class="team-run">0</span></strong>
+        <strong class="mx-1"><span> - </span></strong>
+        <strong><span class="team-wicket">0</span></strong>
+    </div>
+</div>
+<div class="d-flex justify-content-between align-items-center border px-2 p-1 rounded shadow-sm mb-2">
+    <div class="d-flex align-items-center">
+        <span class="batting-team-logo me-2">
+            {% if match.batting_team_id == match.team1.id %}
+                {% with opposite_team=match.team2 %}
+                    <img class="border rounded-circle" style="width: 30px; height:30px;" src="{{ opposite_team.logo.url }}" alt="{{ opposite_team.name }} Logo">
+                {% endwith %}
+            {% else %}
+                {% with opposite_team=match.team1 %}
+                    <img class="border rounded-circle" style="width: 30px; height:30px;" src="{{ opposite_team.logo.url }}" alt="{{ opposite_team.name }} Logo">
+                {% endwith %}
+            {% endif %}
+        </span>
+        <h6 class="mb-0">{% if match.batting_team_id == match.team1.id %} {{ match.team2.name }} {% else %} {{ match.team1.name }} {% endif %}</h6>
+    </div>
+</div>
